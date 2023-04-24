@@ -54,10 +54,8 @@ for (id1 in c(1)){
                 }
                 bg<-bg[rowSums(rr<0)==0,]
                 rr<-rr[rowSums(rr<0)==0,]
-                if(id3%in%c(2)){
-                    rr<-rr[-6,]
-                    bg<-bg[-6,]
-                    }
+                #if(id3%in%c(2)){rr<-rr[-6,]
+                 #   bg<-bg[-6,]}
                 rrid3<-rbind(rrid3,colMeans(rr))
                 bgid3<-rbind(bgid3,colMeans(bg))
             }
@@ -65,8 +63,10 @@ for (id1 in c(1)){
         highbase<-rrid3[1,1]
         #[1] "r0"       "r0X"      "r0A"      "rX"       "rlasso"   "rlasso1"  "rada"     "rada1"
         #[9] "rmul"     "rmul1"    "rmulada"  "rmulada1"
-        rrid3<-rrid3[,c(5,6,9,10)]
-        bgid3<-bgid3[,c(1,2,5,6)]
+        #rrid3<-rrid3[,c(5,6,9,10)]
+        #bgid3<-bgid3[,c(1,2,5,6)]
+        rrid3<-rrid3[,c(7,8,11,12)]
+        bgid3<-bgid3[,c(3,4,7,8)]
 
         cm<-function(methods){
             methods2<-methods
@@ -105,7 +105,7 @@ for (id1 in c(1)){
                             DataSource=rep(cmbg$m2,1,each=nrow(bgid3)),
                             BetaMSE=c(matrix(bgid3,nrow=1,byrow = T)))
         }
-        gname="Lasso"
+        gname="AdaptiveLasso"
         library(ggplot2)
         gg<-ggplot(data = df)+
             geom_point(aes(x=SqrtSize,y=R2,color=Method))+

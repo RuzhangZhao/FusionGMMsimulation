@@ -80,10 +80,10 @@ if(F){
     ntest = 10^6
     My0<-generateM(ntest,p_X,p_A,coefXA,intercept)
     #saveRDS(My0,paste0("/users/rzhao1/fusion/test/test2_",p_X,".rds"))
-    saveRDS(My0,paste0("test2_",p_X,".rds"))
+    saveRDS(My0,paste0("../FusionGMMdata/test2_",p_X,".rds"))
 }else{
     #My0<-readRDS(paste0("/users/rzhao1/fusion/test/test2_",p_X,".rds"))
-    My0<-readRDS(paste0("test2_",p_X,".rds"))
+    My0<-readRDS(paste0("../FusionGMMdata/test2_",p_X,".rds"))
     M0<-My0$M
     y0<-My0$y
 }
