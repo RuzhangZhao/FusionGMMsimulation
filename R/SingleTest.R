@@ -146,13 +146,13 @@ multilm<-sum_res$multilm
 sum_mul<-sum_res$sum_mul
 sum_mul[[1]]$Covariance<-sum_mul[[1]]$Covariance/sum_mul[[1]]$Sample_size
 sum_uni<-sum_res$sum_uni
-fuse_mul_1lam<-fusionGMM.addition(X_int,A_int,y_int,sum_mul,penalty_type = "lasso",summary_type = "multi",approx_cross_validation =F,tune_ratio = T,initial_with_GMM = T)
+fuse_mul_1lam<-fusionGMM.addition(X_int,A_int,y_int,sum_mul,penalty_type = "lasso",summary_type = "multi",approx_cross_validation =F,tune_ratio = F,initial_with_GMM = F)
 rmul1<-R2(y0,M0%*%fuse_mul_1lam$beta)
-fuse_mul_1lam_2init<-fusionGMM.addition(X_int,A_int,y_int,sum_mul,penalty_type = "lasso",summary_type = "multi",approx_cross_validation =F,tune_ratio = T,initial_with_GMM = T)
+fuse_mul_1lam_2init<-fusionGMM.addition(X_int,A_int,y_int,sum_mul,penalty_type = "lasso",summary_type = "multi",approx_cross_validation =F,tune_ratio = F,initial_with_GMM = T)
 rmul2<-R2(y0,M0%*%fuse_mul_1lam_2init$beta)
-fuse_mul_1lam_3C<-fusionGMM.addition(X_int,A_int,y_int,sum_mul,penalty_type = "lasso",summary_type = "multi",approx_cross_validation =F,tune_ratio = T,desparseC = T)
+fuse_mul_1lam_3C<-fusionGMM.addition(X_int,A_int,y_int,sum_mul,penalty_type = "lasso",summary_type = "multi",approx_cross_validation =F,tune_ratio = F,desparseC = T)
 rmul3<-R2(y0,M0%*%fuse_mul_1lam_3C$beta)
-fuse_mul_1lam_2init_4C<-fusionGMM.addition(X_int,A_int,y_int,sum_mul,penalty_type = "lasso",summary_type = "multi",approx_cross_validation =F,tune_ratio = T,initial_with_GMM = T,desparseC = T)
+fuse_mul_1lam_2init_4C<-fusionGMM.addition(X_int,A_int,y_int,sum_mul,penalty_type = "lasso",summary_type = "multi",approx_cross_validation =F,tune_ratio = F,initial_with_GMM = T,desparseC = T)
 rmul4<-R2(y0,M0%*%fuse_mul_1lam_2init_4C$beta)
 #fuse_mul<-fusionGMM.addition(X_int,A_int,y_int,sum_mul,penalty_type = "lasso",summary_type = "multi",approx_cross_validation =F,tune_ratio = T)
 #rmul<-R2(y0,M0%*%fuse_mul$beta)
