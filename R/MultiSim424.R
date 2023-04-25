@@ -1,6 +1,6 @@
 
-for(id2 in c(1)){
-    for(id1 in 1:2){
+for(id2 in c(1:2)){
+    for(id1 in c(1)){
         for(id3 in 1:10){
             p_X_list<-c(10,40)
             inv_r_list<-c(10,30)
@@ -93,7 +93,7 @@ for(id2 in c(1)){
             }
             rr_gap<-list()
             for(i in 1:20){
-                set.seed(2023+i)
+                set.seed(sample(1:2023,1))
                 message(paste0("EPOCH",i))
                 # external data
                 My_ext<-generateM(n_ext,p_X,p_A,coefXA,intercept)
@@ -170,9 +170,8 @@ for(id2 in c(1)){
 
                 rr<-c(r0,r0X,r0A,rX,rlasso,rlasso1,rada,rada1,rmul,rmul1,rmulada,rmulada1,runi,runi1,runiada,runiada1)
                 names(rr)<-c("r0","r0X","r0A","rX","rlasso","rlasso1","rada","rada1","rmul","rmul1","rmulada","rmulada1","runi","runi1","runiada","runiada1")
-
-
                 print(round(rr,3))
+                print(round(betagap,3))
                 rr_gap[[i]]<-list("rr"=rr,"beta"=betagap)
                 if (i %% 5 == 0){
                     saveRDS(rr_gap,paste0('../FusionGMMdata/Ln/Ln_n_',n_int,'_ir_',inv_r,'_pX_',p_X,'.rds'))
