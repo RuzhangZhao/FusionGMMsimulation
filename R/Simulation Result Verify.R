@@ -47,7 +47,7 @@ for (id1 in c(1)){
             if(!file.exists(paste0('R/Ln/Ln_n_',n_int,'_ir_',inv_r,'_pX_',p_X,'.rds'))){
                 skipid<-c(skipid,id3)
             }else{
-                res<-readRDS(paste0('R/Ln/Ln_n_',n_int,'_ir_',inv_r,'_pX_',p_X,'.rds'))
+                res<-readRDS(paste0('../FusionGMMdata/Ln/Ln_n_',n_int,'_ir_',inv_r,'_pX_',p_X,'.rds'))
                 for(i in 1:length(res)){
                     rr<-rbind(rr,res[[i]]$rr)
                     bg<-rbind(bg,res[[i]]$beta)

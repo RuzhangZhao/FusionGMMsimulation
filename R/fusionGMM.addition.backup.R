@@ -130,8 +130,8 @@ fusionGMM.addition<-function(
     pX<-ncol(X)
     pA<-ncol(A)
     if(nX<pX+pA){desparseC<-TRUE}
-    if(nX<700){desparseC<-TRUE}
-    if(nX<700){initial_with_GMM<-TRUE}
+    #if(nX<700){desparseC<-TRUE}
+    #if(nX<700){initial_with_GMM<-TRUE}
     XA<-cbind(X,A)
     Xid<-1:pX
     Aid<-(pX+1):(pX+pA)
@@ -208,7 +208,7 @@ fusionGMM.addition<-function(
 
     # Refined estimation of C
     var_1st_U_beta_theta<-var_U_beta_theta_func(X = X,A = A, y = y,beta = beta_initial,
-                                                                study_info = study_info)
+                                                study_info = study_info)
     var_2nd_grad_times_theta_hat = adiag(matrix(0,nrow = pX+pA,ncol = pX+pA),var_U2)
     inv_C = var_1st_U_beta_theta + var_2nd_grad_times_theta_hat
     if(desparseC){
@@ -270,7 +270,7 @@ fusionGMM.addition<-function(
                 ytrain<-y[-index_test]
                 ytest<-y[index_test]
                 pseudo_Xy_list_train<-pseudo_Xy(C_half,Xtrain,Atrain,
-                                                                ytrain,study_info)
+                                                ytrain,study_info)
                 initial_sf_train<-nrow(Xtrain)/sqrt(nrow(pseudo_Xy_list_train$pseudo_X))
                 pseudo_X_train<-pseudo_Xy_list_train$pseudo_X/initial_sf_train
                 pseudo_y_train<-pseudo_Xy_list_train$pseudo_y/initial_sf_train
@@ -333,7 +333,7 @@ fusionGMM.addition<-function(
                 ytrain<-y[-index_test]
                 ytest<-y[index_test]
                 pseudo_Xy_list_train<-pseudo_Xy(C_half,Xtrain,Atrain,
-                                                                ytrain,study_info)
+                                                ytrain,study_info)
                 initial_sf_train<-nrow(Xtrain)/sqrt(nrow(pseudo_Xy_list_train$pseudo_X))
                 pseudo_X_train<-pseudo_Xy_list_train$pseudo_X/initial_sf_train
                 pseudo_y_train<-pseudo_Xy_list_train$pseudo_y/initial_sf_train
