@@ -172,7 +172,11 @@ for(id2 in c(1:2)){
                 names(rr)<-c("r0","r0X","r0A","rX","rlasso","rlasso1","rada","rada1","rmul","rmul1","rmulada","rmulada1","runi","runi1","runiada","runiada1")
                 print(round(rr,3))
                 print(round(betagap,3))
-                rr_gap[[i]]<-list("rr"=rr,"beta"=betagap)
+                ratios<-c(fuse_uni$ratio_min,fuse_uni_ada$ratio_min,fuse_mul$ratio_min,
+                          fuse_mul_ada$ratio_min)
+                print(round(ratios,3))
+                rr_gap[[i]]<-list("rr"=rr,"beta"=betagap,"ratios"=ratios)
+
                 if (i %% 5 == 0){
                     saveRDS(rr_gap,paste0('../FusionGMMdata/Ln/Ln_n_',n_int,'_ir_',inv_r,'_pX_',p_X,'.rds'))
                 }
