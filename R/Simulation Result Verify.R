@@ -78,18 +78,18 @@ for (id1 in c(2)){
         #[9] "rmul"     "rmul1"    "rmulada"  "rmulada1" "runi"     "runi1"    "runiada"  "runiada1"
         cm<-function(methods){
             methods2<-methods
-            methods2[which(substr(methods,1,4)%in%c("rmul"))]<-"FusionGMM-multivariate"
-            methods2[which(substr(methods,1,4)%in%c("runi"))]<-"FusionGMM-univariate"
+            methods2[which(substr(methods,1,4)%in%c("rmul"))]<-"IntGMM-multivariate"
+            methods2[which(substr(methods,1,4)%in%c("runi"))]<-"IntGMM-univariate"
             methods2[which(substr(methods,1,4)%in%c("rlas","rada"))]<-"InternalOnly"
             methods2[which(substr(methods,1,2)%in%c("rX"))]<-"ExternalOnly"
-            methods[which(methods%in%c("rmul1","runi1"))]<-"GMM-Lasso-1lambda"
-            methods[which(methods%in%c("rmul","runi"))]<-"GMM-Lasso-2lambda"
-            methods[which(methods%in%c("rmulada1","runiada1"))]<-"GMM-AdaLasso-1lambda"
-            methods[which(methods%in%c("rmulada","runiada"))]<-"GMM-AdaLasso-2lambda"
+            methods[which(methods%in%c("rmul1","runi1"))]<-"IntGMM-Lasso-1lam"
+            methods[which(methods%in%c("rmul","runi"))]<-"IntGMM-Lasso-2lam"
+            methods[which(methods%in%c("rmulada1","runiada1"))]<-"IntGMM-AdaLasso-1lambda"
+            methods[which(methods%in%c("rmulada","runiada"))]<-"IntGMM-AdaLasso-2lambda"
             methods[which(methods%in%c("rlasso"))]<-"naive-Lasso-lambda.min"
             methods[which(methods%in%c("rlasso1"))]<-"naive-Lasso-lambda.1se"
-            methods[which(methods%in%c("rada"))]<-"naive-AdaLasso-lambda.min"
-            methods[which(methods%in%c("rada1"))]<-"naive-AdaLasso-lambda.1se"
+            methods[which(methods%in%c("rada"))]<-"naive-AdaLas-lambda.min"
+            methods[which(methods%in%c("rada1"))]<-"naive-AdaLas-lambda.1se"
             methods[which(methods%in%c("rX"))]<-"OLS"
             list("m1"=methods,"m2"=methods2)
         }

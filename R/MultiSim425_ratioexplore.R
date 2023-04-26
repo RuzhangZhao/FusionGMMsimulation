@@ -1,7 +1,7 @@
 
 for(id2 in c(2)){
     for(id1 in c(2)){
-        for(id3 in c(10,9,8,7,6,5,4,3,2,1)){
+        for(id3 in c(3)){
             p_X_list<-c(10,40)
             inv_r_list<-c(10,30)
             n_int_list<-floor((seq(sqrt(100),sqrt(3000),(sqrt(3000) - sqrt(100))/9))^2)
