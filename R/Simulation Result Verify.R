@@ -30,21 +30,32 @@ inv_r_list<-c(10,30)
 #n_int_list<-floor(exp(seq(log(100),log(10000),(log(10000) - log(100))/9)))
 n_int_list<-floor((seq(sqrt(100),sqrt(3000),(sqrt(3000) - sqrt(100))/9))^2)
 n_int_list
-for (id1 in c(1)){
+for (id1 in c(2)){
     p_X<-p_X_list[id1]
-    for(id2 in c(1)){
+    for(id2 in c(2)){
         inv_r<-inv_r_list[id2]
         rrid3<-c()
         bgid3<-c()
         skipid<-c()
         message(c(id1,id2))
-        for(id3 in c(1:10)){
+        for(id3 in c(1:6)){
             p_X<-p_X_list[id1]
             inv_r = inv_r_list[id2]
             n_int = n_int_list[id3]
             rr<-c()
             bg<-c()
-            if(!file.exists(paste0('R/Ln/Ln_n_',n_int,'_ir_',inv_r,'_pX_',p_X,'.rds'))){
+            gname="Lasso"
+            #gname="AdaptiveLasso"
+            if(gname == "Lasso"){
+                lassoindex<-c(5,6,9,10,13,14)
+                lassoindex1<-c(1,2,5,6,9,10)
+            }else{
+                lassoindex<-c(7,8,11,12,15,16)
+                lassoindex1<-c(3,4,7,8,11,12)
+            }
+
+
+            if(!file.exists(paste0('../FusionGMMdata/Ln/Ln_n_',n_int,'_ir_',inv_r,'_pX_',p_X,'.rds'))){
                 skipid<-c(skipid,id3)
             }else{
                 res<-readRDS(paste0('../FusionGMMdata/Ln/Ln_n_',n_int,'_ir_',inv_r,'_pX_',p_X,'.rds'))
@@ -52,6 +63,8 @@ for (id1 in c(1)){
                     rr<-rbind(rr,res[[i]]$rr)
                     bg<-rbind(bg,res[[i]]$beta)
                 }
+                bg<-bg[,lassoindex1]
+                rr<-rr[,lassoindex]
                 bg<-bg[rowSums(rr<0)==0,]
                 rr<-rr[rowSums(rr<0)==0,]
                 #if(id3%in%c(2)){rr<-rr[-6,]
@@ -62,26 +75,21 @@ for (id1 in c(1)){
         }
         highbase<-rrid3[1,1]
         #[1] "r0"       "r0X"      "r0A"      "rX"       "rlasso"   "rlasso1"  "rada"     "rada1"
-        #[9] "rmul"     "rmul1"    "rmulada"  "rmulada1"
-        #rrid3<-rrid3[,c(5,6,9,10)]
-        #bgid3<-bgid3[,c(1,2,5,6)]
-        rrid3<-rrid3[,c(7,8,11,12)]
-        bgid3<-bgid3[,c(3,4,7,8)]
-
+        #[9] "rmul"     "rmul1"    "rmulada"  "rmulada1" "runi"     "runi1"    "runiada"  "runiada1"
         cm<-function(methods){
             methods2<-methods
-            methods2[which(substr(methods,1,4)%in%c("rmul"))]<-"FusionGMM.mul"
-            methods2[which(substr(methods,1,4)%in%c("runi"))]<-"FusionGMM.uni"
+            methods2[which(substr(methods,1,4)%in%c("rmul"))]<-"FusionGMM-multivariate"
+            methods2[which(substr(methods,1,4)%in%c("runi"))]<-"FusionGMM-univariate"
             methods2[which(substr(methods,1,4)%in%c("rlas","rada"))]<-"InternalOnly"
             methods2[which(substr(methods,1,2)%in%c("rX"))]<-"ExternalOnly"
-            methods[which(methods%in%c("rmul1","runi1"))]<-"GMM.Las.1Lam"
-            methods[which(methods%in%c("rmul","runi"))]<-"GMM.Las.2Lam"
-            methods[which(methods%in%c("rmulada1","runiada1"))]<-"GMM.ALas.1Lam"
-            methods[which(methods%in%c("rmulada","runiada"))]<-"GMM.ALas.2Lam"
-            methods[which(methods%in%c("rlasso"))]<-"Lasso.min"
-            methods[which(methods%in%c("rlasso1"))]<-"Lasso.1se"
-            methods[which(methods%in%c("rada"))]<-"Alasso.min"
-            methods[which(methods%in%c("rada1"))]<-"Alasso.1se"
+            methods[which(methods%in%c("rmul1","runi1"))]<-"GMM-Lasso-1lambda"
+            methods[which(methods%in%c("rmul","runi"))]<-"GMM-Lasso-2lambda"
+            methods[which(methods%in%c("rmulada1","runiada1"))]<-"GMM-AdaLasso-1lambda"
+            methods[which(methods%in%c("rmulada","runiada"))]<-"GMM-AdaLasso-2lambda"
+            methods[which(methods%in%c("rlasso"))]<-"naive-Lasso-lambda.min"
+            methods[which(methods%in%c("rlasso1"))]<-"naive-Lasso-lambda.1se"
+            methods[which(methods%in%c("rada"))]<-"naive-AdaLasso-lambda.min"
+            methods[which(methods%in%c("rada1"))]<-"naive-AdaLasso-lambda.1se"
             methods[which(methods%in%c("rX"))]<-"OLS"
             list("m1"=methods,"m2"=methods2)
         }
@@ -105,22 +113,22 @@ for (id1 in c(1)){
                             DataSource=rep(cmbg$m2,1,each=nrow(bgid3)),
                             BetaMSE=c(matrix(bgid3,nrow=1,byrow = T)))
         }
-        gname="AdaptiveLasso"
+
         library(ggplot2)
         gg<-ggplot(data = df)+
-            geom_point(aes(x=SqrtSize,y=R2,color=Method))+
+            geom_point(aes(x=SqrtSize,y=R2,color=Method,shape = DataSource))+
             geom_line(aes(x=SqrtSize,y=R2,color=Method,linetype = DataSource))+
             geom_hline(yintercept = highbase,color = "darkred")+
             annotate("text", x = 20, y = highbase*1.015, label = "Max Achievable R2",size=3)+
             labs(title = paste0("R2:Comp:Incomp=1:",inv_r,";RiskFactor:",p_X))+
             theme_bar()
-        ggsave(paste0("plotlocal/",gname,":R2:Comp:Incomp=1:",inv_r,";RiskFactor:",p_X,".png"),gg,width = 6,height = 5)
+        ggsave(paste0("plotlocal/",gname,":R2:Comp:Incomp=1:",inv_r,";RiskFactor:",p_X,".png"),gg,width = 7,height = 5)
         gg<-ggplot(data = df2)+
             geom_point(aes(x=SqrtSize,y=BetaMSE,color=Method))+
             geom_line(aes(x=SqrtSize,y=BetaMSE,color=Method,linetype = DataSource))+
             labs(title = paste0("BetaMSE:Comp:Incomp=1:",inv_r,";RiskFactor:",p_X))+
             theme_bar()
-        ggsave(paste0("plotlocal/",gname,":BetaMSE:Comp:Incomp=1:",inv_r,";RiskFactor:",p_X,".png"),gg,width = 6,height = 5)
+        ggsave(paste0("plotlocal/",gname,":BetaMSE:Comp:Incomp=1:",inv_r,";RiskFactor:",p_X,".png"),gg,width = 7,height = 5)
     }
 }
 

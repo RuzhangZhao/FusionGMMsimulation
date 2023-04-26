@@ -1,7 +1,7 @@
 
 for(id2 in c(2)){
     for(id1 in c(2)){
-        for(id3 in c(7:10)){
+        for(id3 in c(10,9,8,7,6,5,4,3,2,1)){
             p_X_list<-c(10,40)
             inv_r_list<-c(10,30)
             n_int_list<-floor((seq(sqrt(100),sqrt(3000),(sqrt(3000) - sqrt(100))/9))^2)
@@ -92,8 +92,8 @@ for(id2 in c(2)){
                 1-sum((predy-scale(y0,scale = F))^2)/sum((scale(y0,scale = F))^2)
             }
             rr_gap<-list()
-            for(i in 1:20){
-                set.seed(sample(1:2023,1))
+            for(i in 1:10){
+                set.seed(sample(1:20232023,1))
                 message(paste0("EPOCH",i))
                 # external data
                 My_ext<-generateM(n_ext,p_X,p_A,coefXA,intercept)
@@ -111,25 +111,15 @@ for(id2 in c(2)){
                 y_int<-scale(y_int,scale = F)
                 X_int<-M_int[,1:p_X]
                 A_int<-M_int[,-c(1:p_X)]
-
-                fuse_uni<-fusionGMM.addition(X_int,A_int,y_int,sum_uni,penalty_type = "lasso",summary_type = "uni",approx_cross_validation =F)
-                fuse_uni_1lam<-fusionGMM.addition(X_int,A_int,y_int,sum_uni,penalty_type = "lasso",summary_type = "uni",approx_cross_validation =F,tune_ratio = F)
-                cat("20%")
-                fuse_uni_ada<-fusionGMM.addition(X_int,A_int,y_int,sum_uni,penalty_type = "adaptivelasso",summary_type = "uni",approx_cross_validation =F)
-                fuse_uni_ada_1lam<-fusionGMM.addition(X_int,A_int,y_int,sum_uni,penalty_type = "adaptivelasso",summary_type = "uni",approx_cross_validation =F,tune_ratio = F)
-                cat("40%")
-                fuse_mul<-fusionGMM.addition(X_int,A_int,y_int,sum_mul,penalty_type = "lasso",summary_type = "multi",approx_cross_validation =F)
-                fuse_mul_1lam<-fusionGMM.addition(X_int,A_int,y_int,sum_mul,penalty_type = "lasso",summary_type = "multi",approx_cross_validation =F,tune_ratio = F)
-                cat("60%")
-                fuse_mul_ada<-fusionGMM.addition(X_int,A_int,y_int,sum_mul,penalty_type = "adaptivelasso",summary_type = "multi",approx_cross_validation =F)
-                fuse_mul_ada_1lam<-fusionGMM.addition(X_int,A_int,y_int,sum_mul,penalty_type = "adaptivelasso",summary_type = "multi",approx_cross_validation =F,tune_ratio = F)
-                cat("80%")
-
+                ratio_lower<-(1/(1+inv_r))
+                ratio_upper<-(1+inv_r)
+                ratio_count<-20
+                ratio_range<-(seq(sqrt(ratio_lower),sqrt(ratio_upper),(sqrt(ratio_upper)-sqrt(ratio_lower))/ratio_count)^2)
+                fuse_mul<-fusionGMM.addition(X_int,A_int,y_int,sum_mul,penalty_type = "lasso",summary_type = "multi",ratio_range = ratio_range)
+                fuse_mul_1lam<-fusionGMM.addition(X_int,A_int,y_int,sum_mul,penalty_type = "lasso",summary_type = "multi",tune_ratio = F)
+                fuse_mul_fix1<-fusionGMM.addition(X_int,A_int,y_int,sum_mul,penalty_type = "lasso",summary_type = "multi",tune_ratio = F,fix_ratio = sqrt((1/(1+inv_r))))
+                fuse_mul_fix2<-fusionGMM.addition(X_int,A_int,y_int,sum_mul,penalty_type = "lasso",summary_type = "multi",tune_ratio = F,fix_ratio = sqrt((1+inv_r)))
                 fuse_lasso<-cv.glmnet(x = M_int,y = y_int)
-                fuse_ridge<-cv.glmnet(x = M_int,y = y_int,alpha=0)
-                www<-1/abs(c(coef(fuse_ridge,s="lambda.min")[-1]))^(1/2)
-                www[is.infinite(www)]<-max(www[!is.infinite(www)])*100
-                fuse_ada<-cv.glmnet(x = M_int,y = y_int,penalty.factor = www)
                 cat("95%\n")
                 r0<-R2(y0,M0%*%coefXA)
                 r0X<-R2(y0,M0[,1:p_X]%*%coef_X)
@@ -137,48 +127,35 @@ for(id2 in c(2)){
                 rX<-R2(y0,M0[,1:p_X]%*%sum_mul[[1]]$Coeff)
                 rlasso<-R2(y0,M0%*%coef(fuse_lasso,s="lambda.min")[-1])
                 rlasso1<-R2(y0,M0%*%coef(fuse_lasso,s="lambda.1se")[-1])
-                rada<-R2(y0,M0%*%coef(fuse_ada,s="lambda.min")[-1])
-                rada1<-R2(y0,M0%*%coef(fuse_ada,s="lambda.1se")[-1])
 
-                runi<-R2(y0,M0%*%fuse_uni$beta)
-                runi1<-R2(y0,M0%*%fuse_uni_1lam$beta)
-                runiada<-R2(y0,M0%*%fuse_uni_ada$beta)
-                runiada1<-R2(y0,M0%*%fuse_uni_ada_1lam$beta)
 
                 rmul<-R2(y0,M0%*%fuse_mul$beta)
                 rmul1<-R2(y0,M0%*%fuse_mul_1lam$beta)
-                rmulada<-R2(y0,M0%*%fuse_mul_ada$beta)
-                rmulada1<-R2(y0,M0%*%fuse_mul_ada_1lam$beta)
+                rmulf1<-R2(y0,M0%*%fuse_mul_fix1$beta)
+                rmulf2<-R2(y0,M0%*%fuse_mul_fix2$beta)
 
                 #rmulap<-R2(y0,M0%*%fuse_mul_app$beta)
                 #rmul1ap<-R2(y0,M0%*%fuse_mul_1lam_app$beta)
 
                 betagap<-c(sum((coef(fuse_lasso,s="lambda.min")[-1] - coefXA)^2),
                            sum((coef(fuse_lasso,s="lambda.1se")[-1] - coefXA)^2),
-                           sum((coef(fuse_ada,s="lambda.min")[-1] - coefXA)^2),
-                           sum((coef(fuse_ada,s="lambda.1se")[-1] - coefXA)^2),
                            sum((fuse_mul$beta - coefXA)^2),
                            sum((fuse_mul_1lam$beta - coefXA)^2),
-                           sum((fuse_mul_ada$beta - coefXA)^2),
-                           sum((fuse_mul_ada_1lam$beta - coefXA)^2),
-                           sum((fuse_uni$beta - coefXA)^2),
-                           sum((fuse_uni_1lam$beta - coefXA)^2),
-                           sum((fuse_uni_ada$beta - coefXA)^2),
-                           sum((fuse_uni_ada_1lam$beta - coefXA)^2)
+                           sum((fuse_mul_fix1$beta - coefXA)^2),
+                           sum((fuse_mul_fix2$beta - coefXA)^2)
                 )
-                names(betagap)<-c("rlasso","rlasso1","rada","rada1","rmul","rmul1","rmulada","rmulada1","runi","runi1","runiada","runiada1")
+                names(betagap)<-c("rlasso","rlasso1","rmul","rmul1","rmulfix1","rmulfix2")
 
-                rr<-c(r0,r0X,r0A,rX,rlasso,rlasso1,rada,rada1,rmul,rmul1,rmulada,rmulada1,runi,runi1,runiada,runiada1)
-                names(rr)<-c("r0","r0X","r0A","rX","rlasso","rlasso1","rada","rada1","rmul","rmul1","rmulada","rmulada1","runi","runi1","runiada","runiada1")
+                rr<-c(r0,r0X,r0A,rX,rlasso,rlasso1,rmul,rmul1,rmulf1,rmulf2)
+                names(rr)<-c("r0","r0X","r0A","rX","rlasso","rlasso1","rmul","rmul1","rmulfix1","rmulfix2")
                 print(round(rr,3))
                 print(round(betagap,3))
-                ratios<-c(fuse_uni$ratio_min,fuse_uni_ada$ratio_min,fuse_mul$ratio_min,
-                          fuse_mul_ada$ratio_min)
+                ratios<-c(fuse_mul$ratio_min)
                 print(round(ratios,3))
                 rr_gap[[i]]<-list("rr"=rr,"beta"=betagap,"ratios"=ratios)
 
                 if (i %% 5 == 0){
-                    saveRDS(rr_gap,paste0('../FusionGMMdata/Ln/Ln_n_',n_int,'_ir_',inv_r,'_pX_',p_X,'.rds'))
+                    saveRDS(rr_gap,paste0('../FusionGMMdata/ratio/Ln_n_',n_int,'_ir_',inv_r,'_pX_',p_X,'.rds'))
                 }
             }
         }}}
