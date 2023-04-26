@@ -92,9 +92,10 @@ fusionGMM.addition<-function(
         ratio_lower = NULL,
         ratio_upper = NULL,
         ratio_count = 10,
+        ratio_range = NULL,
         gamma_adaptivelasso = 1/2,
         inference = FALSE,
-        approx_cross_validation = TRUE,
+        approx_cross_validation = FALSE,
         kfolds = 10,
         desparseC = FALSE
 ){
@@ -230,10 +231,12 @@ fusionGMM.addition<-function(
     lambda_list<-fit_final$lambda
 
     if(tune_ratio & !remove_penalty_X & !remove_penalty_A){
-        if(is.null(ratio_lower)){ratio_lower<-sqrt(nX/(nX+nXext))/2}
-        if(is.null(ratio_upper)){ratio_upper<-1}
-        ratio_range<-exp(seq(log(ratio_lower),log(ratio_upper),(log(ratio_upper)-log(ratio_lower))/ratio_count))
-        ratio_range<-c(ratio_range,2)
+        if(is.null(ratio_range)){
+            if(is.null(ratio_lower)){ratio_lower<-sqrt(nX/(nX+nXext))/2}
+            if(is.null(ratio_upper)){ratio_upper<-1}
+            ratio_range<-exp(seq(log(ratio_lower),log(ratio_upper),(log(ratio_upper)-log(ratio_lower))/ratio_count))
+            ratio_range<-c(ratio_range,2)
+        }
         if(approx_cross_validation){
             ## approximate cross validation
             cv_ratio<-lapply(ratio_range,function(cur_ratio){
@@ -370,7 +373,7 @@ fusionGMM.addition<-function(
         pval_final<-pchisq(nX*beta[index_nonzero]^2/final_v,1,lower.tail = F)
         corrected_pos<-index_nonzero[which(pval_final<0.05/length(index_nonzero))]
         return_list<-c(return_list,
-                       list("corrected_pos"=pos,
+                       list("corrected_pos"=corrected_pos,
                             "nonzero_pos"=index_nonzero,
                             "pval"=pval_final,
                             "nonzero_var"=final_v))
