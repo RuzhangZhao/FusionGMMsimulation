@@ -3,7 +3,7 @@ library(magic)
 library(mvtnorm)
 for(id2 in c(1:2)){
     for(id1 in c(1:2)){
-        for(id3 in c(1:10)){
+        for(id3 in c(2:10)){
             p_X_list<-c(10,40)
             inv_r_list<-c(10,30)
             n_int_list<-floor((seq(sqrt(100),sqrt(3000),(sqrt(3000) - sqrt(100))/9))^2)
@@ -188,7 +188,7 @@ for(id2 in c(1:2)){
                 rr_gap[[i]]<-list("rr"=rr,"beta"=betagap,"ratios"=ratios)
 
                 if (i %% 5 == 0){
-                    saveRDS(rr_gap,paste0('../FusionGMMdata/Lg/Ln_n_',n_int,'_ir_',inv_r,'_pX_',p_X,'.rds'))
+                    saveRDS(rr_gap,paste0('../FusionGMMdata/Lg/Lg_n_',n_int,'_ir_',inv_r,'_pX_',p_X,'.rds'))
                 }
             }
         }}}
