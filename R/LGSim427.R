@@ -131,10 +131,10 @@ for(id2 in c(1:2)){
                 cat("80%")
 
                 fuse_lasso<-cv.glmnet(x = M_int,y = y_int)
-                #fuse_ridge<-cv.glmnet(x = M_int,y = y_int,alpha=0)
-                #www<-1/abs(c(coef(fuse_ridge,s="lambda.min")[-1]))^(1/2)
-                #www[is.infinite(www)]<-max(www[!is.infinite(www)])*100
-                #fuse_ada<-cv.glmnet(x = M_int,y = y_int,penalty.factor = www)
+                fuse_ridge<-cv.glmnet(x = M_int,y = y_int,alpha=0)
+                www<-1/abs(c(coef(fuse_ridge,s="lambda.min")[-1]))^(1/2)
+                www[is.infinite(www)]<-max(www[!is.infinite(www)])*100
+                fuse_ada<-cv.glmnet(x = M_int,y = y_int,penalty.factor = www)
                 cat("95%\n")
                 library(pROC)
                 RC<-function(pred_y){
