@@ -30,8 +30,8 @@ inv_r_list<-c(10,30)
 #n_int_list<-floor(exp(seq(log(100),log(10000),(log(10000) - log(100))/9)))
 n_int_list<-floor((seq(sqrt(100),sqrt(3000),(sqrt(3000) - sqrt(100))/9))^2)
 gname="Lasso"
-gname="AdaptiveLasso"
-for (id1 in c(1)){
+#gname="AdaptiveLasso"
+for (id1 in c(1:2)){
     p_X<-p_X_list[id1]
     for(id2 in c(1:2)){
         inv_r<-inv_r_list[id2]
@@ -46,18 +46,18 @@ for (id1 in c(1)){
             rr<-c()
             bg<-c()
             if(gname == "Lasso"){
-                lassoindex<-c(5,6,9,10,13,14)
-                lassoindex1<-c(1,2,5,6,9,10)
+                lassoindex<-c(5,6,7,8,9,10)
+                lassoindex1<-c(1:6)
             }else{
                 lassoindex<-c(7,8,11,12,15,16)
                 lassoindex1<-c(3,4,7,8,11,12)
             }
 
 
-            if(!file.exists(paste0('../FusionGMMdata/Lnmini/Ln_n_',n_int,'_ir_',inv_r,'_pX_',p_X,'.rds'))){
+            if(!file.exists(paste0('../FusionGMMdata/ratio/Ln_n_',n_int,'_ir_',inv_r,'_pX_',p_X,'.rds'))){
                 skipid<-c(skipid,id3)
             }else{
-                res<-readRDS(paste0('../FusionGMMdata/Lnmini/Ln_n_',n_int,'_ir_',inv_r,'_pX_',p_X,'.rds'))
+                res<-readRDS(paste0('../FusionGMMdata/ratio/Ln_n_',n_int,'_ir_',inv_r,'_pX_',p_X,'.rds'))
                 for(i in 1:length(res)){
                     rr<-rbind(rr,res[[i]]$rr)
                     bg<-rbind(bg,res[[i]]$beta)
@@ -68,7 +68,7 @@ for (id1 in c(1)){
                 bg<-bg[rowSums(rr<0)==0,]
                 rr<-rr[rowSums(rr<0)==0,]
                 #if(id3%in%c(2)){rr<-rr[-6,]
-                 #   bg<-bg[-6,]}
+                #   bg<-bg[-6,]}
                 rrid3<-rbind(rrid3,colMeans(rr))
                 bgid3<-rbind(bgid3,colMeans(bg))
             }
@@ -122,13 +122,13 @@ for (id1 in c(1)){
             annotate("text", x = 20, y = highbase*1.015, label = "Max Achievable R2",size=3)+
             labs(title = paste0("R2:Comp:Incomp=1:",inv_r,";RiskFactor:",p_X))+
             theme_bar()
-        ggsave(paste0("plotlocal/",gname,":R2:Comp:Incomp=1:",inv_r,";RiskFactor:",p_X,".png"),gg,width = 7,height = 5)
+        ggsave(paste0("plotlocalratio/",gname,":R2:Comp:Incomp=1:",inv_r,";RiskFactor:",p_X,".png"),gg,width = 7,height = 5)
         gg<-ggplot(data = df2)+
             geom_point(aes(x=SqrtSize,y=BetaMSE,color=Method))+
             geom_line(aes(x=SqrtSize,y=BetaMSE,color=Method,linetype = DataSource))+
             labs(title = paste0("BetaMSE:Comp:Incomp=1:",inv_r,";RiskFactor:",p_X))+
             theme_bar()
-        ggsave(paste0("plotlocal/",gname,":BetaMSE:Comp:Incomp=1:",inv_r,";RiskFactor:",p_X,".png"),gg,width = 7,height = 5)
+        ggsave(paste0("plotlocalratio/",gname,":BetaMSE:Comp:Incomp=1:",inv_r,";RiskFactor:",p_X,".png"),gg,width = 7,height = 5)
     }
 }
 
