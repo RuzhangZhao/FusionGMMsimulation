@@ -30,10 +30,10 @@ inv_r_list<-c(10,30)
 #n_int_list<-floor(exp(seq(log(100),log(10000),(log(10000) - log(100))/9)))
 n_int_list<-floor((seq(sqrt(100),sqrt(3000),(sqrt(3000) - sqrt(100))/9))^2)
 gname="Lasso"
-gname="AdaptiveLasso"
+#gname="AdaptiveLasso"
 for (id1 in c(1)){
     p_X<-p_X_list[id1]
-    for(id2 in c(1:2)){
+    for(id2 in c(1)){
         inv_r<-inv_r_list[id2]
         rrid3<-c()
         bgid3<-c()
@@ -46,18 +46,18 @@ for (id1 in c(1)){
             rr<-c()
             bg<-c()
             if(gname == "Lasso"){
-                lassoindex<-c(5,6,9,10,13,14)
-                lassoindex1<-c(1,2,5,6,9,10)
+                lassoindex<-c(5,9,10,13,14)
+                lassoindex1<-c(1,5,6,9,10)
             }else{
-                lassoindex<-c(7,8,11,12,15,16)
-                lassoindex1<-c(3,4,7,8,11,12)
+                lassoindex<-c(7,11,12,15,16)
+                lassoindex1<-c(3,7,8,11,12)
             }
+            foldchange<-'Lnmini/Ln'
 
-
-            if(!file.exists(paste0('../FusionGMMdata/Lnmini/Ln_n_',n_int,'_ir_',inv_r,'_pX_',p_X,'.rds'))){
+            if(!file.exists(paste0('../FusionGMMdata/',foldchange,'_n_',n_int,'_ir_',inv_r,'_pX_',p_X,'.rds'))){
                 skipid<-c(skipid,id3)
             }else{
-                res<-readRDS(paste0('../FusionGMMdata/Lnmini/Ln_n_',n_int,'_ir_',inv_r,'_pX_',p_X,'.rds'))
+                res<-readRDS(paste0('../FusionGMMdata/',foldchange,'_n_',n_int,'_ir_',inv_r,'_pX_',p_X,'.rds'))
                 for(i in 1:length(res)){
                     rr<-rbind(rr,res[[i]]$rr)
                     bg<-rbind(bg,res[[i]]$beta)
@@ -80,15 +80,15 @@ for (id1 in c(1)){
             methods2<-methods
             methods2[which(substr(methods,1,4)%in%c("rmul"))]<-"IntGMM-multivariate"
             methods2[which(substr(methods,1,4)%in%c("runi"))]<-"IntGMM-univariate"
-            methods2[which(substr(methods,1,4)%in%c("rlas","rada"))]<-"OnlyInternal"
+            methods2[which(substr(methods,1,4)%in%c("rlas","rada"))]<-"InternalOnly"
             methods2[which(substr(methods,1,2)%in%c("rX"))]<-"OnlyExternal"
             methods[which(methods%in%c("rmul1","runi1"))]<-"IntGMM-Lasso-1lam"
             methods[which(methods%in%c("rmul","runi"))]<-"IntGMM-Lasso-2lam"
-            methods[which(methods%in%c("rmulada1","runiada1"))]<-"IntGMM-AdaLasso-1lambda"
-            methods[which(methods%in%c("rmulada","runiada"))]<-"IntGMM-AdaLasso-2lambda"
-            methods[which(methods%in%c("rlasso"))]<-"naive-Lasso-lambda.min"
+            methods[which(methods%in%c("rmulada1","runiada1"))]<-"IntGMM-AdaLasso-1lam"
+            methods[which(methods%in%c("rmulada","runiada"))]<-"IntGMM-AdaLasso-2lam"
+            methods[which(methods%in%c("rlasso"))]<-"naive-Lasso"
             methods[which(methods%in%c("rlasso1"))]<-"naive-Lasso-lambda.1se"
-            methods[which(methods%in%c("rada"))]<-"naive-AdaLas-lambda.min"
+            methods[which(methods%in%c("rada"))]<-"naive-AdaLasso"
             methods[which(methods%in%c("rada1"))]<-"naive-AdaLas-lambda.1se"
             methods[which(methods%in%c("rX"))]<-"OLS"
             list("m1"=methods,"m2"=methods2)
@@ -112,6 +112,8 @@ for (id1 in c(1)){
                             Method=rep(cmbg$m1,1,each=nrow(bgid3)),
                             DataSource=rep(cmbg$m2,1,each=nrow(bgid3)),
                             BetaMSE=c(matrix(bgid3,nrow=1,byrow = T)))
+            df$DataSource<-factor(df$DataSource, levels = c("IntGMM-multivariate","IntGMM-univariate","InternalOnly"))
+            df2$DataSource<-factor(df2$DataSource, levels = c("IntGMM-multivariate","IntGMM-univariate","InternalOnly"))
         }
 
         library(ggplot2)
@@ -120,15 +122,19 @@ for (id1 in c(1)){
             geom_line(aes(x=SqrtSize,y=R2,color=Method,linetype = DataSource))+
             geom_hline(yintercept = highbase,color = "darkred")+
             annotate("text", x = 20, y = highbase*1.015, label = "Max Achievable R2",size=3)+
-            labs(title = paste0("R2:Comp:Incomp=1:",inv_r,";RiskFactor:",p_X))+
-            theme_bar()
+            #annotate("text", x = 26, y = highbase*1.005, label = "Max Achievable AUC",size=3)+
+            labs(title = paste0("AUC:Comp:Incomp=1:",inv_r,";RiskFactor:",p_X))+
+            ylab("AUC")+
+            theme_bar()+
+            scale_x_continuous(breaks = sqrt(n_int_list),labels =n_int_list,name = "Internal Sample Size")
+
         ggsave(paste0("plotlocal/",gname,":R2:Comp:Incomp=1:",inv_r,";RiskFactor:",p_X,".png"),gg,width = 7,height = 5)
         gg<-ggplot(data = df2)+
             geom_point(aes(x=SqrtSize,y=BetaMSE,color=Method))+
             geom_line(aes(x=SqrtSize,y=BetaMSE,color=Method,linetype = DataSource))+
             labs(title = paste0("BetaMSE:Comp:Incomp=1:",inv_r,";RiskFactor:",p_X))+
             theme_bar()
-        ggsave(paste0("plotlocal/",gname,":BetaMSE:Comp:Incomp=1:",inv_r,";RiskFactor:",p_X,".png"),gg,width = 7,height = 5)
+        #ggsave(paste0("plotlg/",gname,":BetaMSE:Comp:Incomp=1:",inv_r,";RiskFactor:",p_X,".png"),gg,width = 7,height = 5)
     }
 }
 

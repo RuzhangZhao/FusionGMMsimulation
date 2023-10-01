@@ -9,18 +9,25 @@ for(j in 1:100){
         fdr[i]<-fdr[i]+sum(!curpos%in%truepos)/length(curpos)
     }
 }
-t1e<-t1e/100
-fdr<-fdr/100
 names(t1e)<-c("adalasso","intGMM-ada-uni-2lambda","intGMM-ada-uni-1lambda","intGMM-ada-mul-2lambda","intGMM-ada-mul-1lambda")
 names(fdr)<-c("adalasso","intGMM-ada-uni-2lambda","intGMM-ada-uni-1lambda","intGMM-ada-mul-2lambda","intGMM-ada-mul-1lambda")
 
-> t1e
-adalasso intGMM-ada-uni-2lambda intGMM-ada-uni-1lambda
-1.141304e-03           2.065217e-03           2.500000e-03
-intGMM-ada-mul-2lambda intGMM-ada-mul-1lambda
-5.434783e-05           5.434783e-05
-> fdr
-adalasso intGMM-ada-uni-2lambda intGMM-ada-uni-1lambda
-0.030452381            0.055309524            0.066666667
-intGMM-ada-mul-2lambda intGMM-ada-mul-1lambda
-0.001428571            0.001428571
+fdr<-c()
+pwr<-c()
+fdr2<-c()
+pwr2<-c()
+coverage<-c()
+for(i in 1:length(res)){
+    fdr<-rbind(fdr,res[[i]][[1]])
+    fdr2<-rbind(fdr2,res[[i]][[2]])
+    pwr<-rbind(pwr,res[[i]][[3]])
+    pwr2<-rbind(pwr2,res[[i]][[4]])
+    coverage<-rbind(coverage,res[[i]][[5]])
+}
+colMeans(fdr)
+colMeans(pwr)
+colMeans(coverage)
+
+colMeans(fdr2)
+colMeans(pwr2)
+

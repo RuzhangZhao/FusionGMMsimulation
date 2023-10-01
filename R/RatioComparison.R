@@ -56,3 +56,9 @@ for(i in 1:100){
     print(summary(a)$r.squared)
 }
 
+a<-lm(y~n_int,data = data.frame(y=ratios[,1],inv_r=ratios[,3]^(1/2),n_int=(ratios[,4])^(1/10)))
+print(summary(a)$r.squared)
+a<-lm(y~n_int_1_3+ratios,data = data.frame(y=ratios[,1],ratios=ratios[,3]^(-1/2),n_int_1_3=(ratios[,4])^(1/3)))
+summary(a)
+print(summary(a)$r.squared)
+

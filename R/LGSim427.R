@@ -1,9 +1,9 @@
 library(locfit)
 library(magic)
 library(mvtnorm)
-for(id2 in c(1:2)){
-    for(id1 in c(1:2)){
-        for(id3 in c(2:10)){
+for(id2 in c(1)){
+    for(id1 in c(2)){
+        for(id3 in c(3:10)){
             p_X_list<-c(10,40)
             inv_r_list<-c(10,30)
             n_int_list<-floor((seq(sqrt(100),sqrt(3000),(sqrt(3000) - sqrt(100))/9))^2)
@@ -20,13 +20,13 @@ for(id2 in c(1:2)){
             #p_X<-10
             p_A<-150
             XAcolnames<-c(paste0("X",1:p_X),paste0("A",1:p_A))
-            intercept<- -2.3
+            intercept<- -1/3
             coef_X<-rep(0,p_X)
             coef_A<-rep(0,p_A)
             X_nonzero_index<-1:10
             A_nonzero_index<-c(11,12,13,17,21,26,31,34,36,50,64,67,69,88,90)-10 #15 nonzero
-            coef_X[X_nonzero_index]<- 0.3
-            coef_A[A_nonzero_index]<- 0.25
+            coef_X[X_nonzero_index]<- 0.3/2
+            coef_A[A_nonzero_index]<- 0.25/2
             coefXA<-c(coef_X,coef_A)
             XAc<-list()
             XAc[[10]]<-c(8,9)
@@ -130,11 +130,11 @@ for(id2 in c(1:2)){
                 fuse_mul_ada_1lam<-fusionGMM.binary.addition(X_int,A_int,1,y_int,sum_mul,penalty_type = "adaptivelasso",summary_type = "multi",approx_cross_validation =F,tune_ratio = F)
                 cat("80%")
 
-                fuse_lasso<-cv.glmnet(x = M_int,y = y_int)
-                fuse_ridge<-cv.glmnet(x = M_int,y = y_int,alpha=0)
+                fuse_lasso<-cv.glmnet(x = M_int,y = y_int,family = "binomial")
+                fuse_ridge<-cv.glmnet(x = M_int,y = y_int,alpha=0,family = "binomial")
                 www<-1/abs(c(coef(fuse_ridge,s="lambda.min")[-1]))^(1/2)
                 www[is.infinite(www)]<-max(www[!is.infinite(www)])*100
-                fuse_ada<-cv.glmnet(x = M_int,y = y_int,penalty.factor = www)
+                fuse_ada<-cv.glmnet(x = M_int,y = y_int,penalty.factor = www,family = "binomial")
                 cat("95%\n")
                 library(pROC)
                 RC<-function(pred_y){

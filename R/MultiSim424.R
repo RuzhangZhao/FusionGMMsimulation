@@ -1,10 +1,9 @@
-
-for(id2 in c(2)){
-    for(id1 in c(2)){
-        for(id3 in c(7:10)){
-            p_X_list<-c(10,40)
-            inv_r_list<-c(10,30)
-            n_int_list<-floor((seq(sqrt(100),sqrt(3000),(sqrt(3000) - sqrt(100))/9))^2)
+p_X_list<-c(10,40)
+inv_r_list<-c(10,30)
+n_int_list<-floor((seq(sqrt(100),sqrt(3000),(sqrt(3000) - sqrt(100))/9))^2)
+for(id1 in c(1:2)){
+    for(id2 in c(1:2)){
+        for(id3 in c(2:10)){
             p_X<-p_X_list[id1]
             inv_r<-inv_r_list[id2]
             n_int<-n_int_list[id3]
@@ -54,7 +53,8 @@ for(id2 in c(2)){
                     }
                 }
                 M<-scale(M)
-                y<-M%*%coefs+intercept+rnorm(n,0,3)
+                #y<-M%*%coefs+intercept+rnorm(n,0,3)
+                y<-M%*%coefs+intercept+rnorm(n,0,1/3)
                 list("M"=M,"y"=y)
             }
             summary_stat<-function(M,y,p_X){
@@ -80,9 +80,11 @@ for(id2 in c(2)){
                 ntest = 10^6
                 My0<-generateM(ntest,p_X,p_A,coefXA,intercept)
                 #saveRDS(My0,paste0("/users/rzhao1/fusion/test/test2_",p_X,".rds"))
+                #saveRDS(My0,paste0("../FusionGMMdata/test2_",p_X,".rds"))
                 saveRDS(My0,paste0("../FusionGMMdata/test2_",p_X,".rds"))
             }else{
                 #My0<-readRDS(paste0("/users/rzhao1/fusion/test/test2_",p_X,".rds"))
+                #My0<-readRDS(paste0("../FusionGMMdata/test2_",p_X,".rds"))
                 My0<-readRDS(paste0("../FusionGMMdata/test2_",p_X,".rds"))
                 M0<-My0$M
                 y0<-My0$y
@@ -92,7 +94,7 @@ for(id2 in c(2)){
                 1-sum((predy-scale(y0,scale = F))^2)/sum((scale(y0,scale = F))^2)
             }
             rr_gap<-list()
-            for(i in 1:20){
+            for(i in 1:10){
                 set.seed(sample(1:2023,1))
                 message(paste0("EPOCH",i))
                 # external data
@@ -178,7 +180,7 @@ for(id2 in c(2)){
                 rr_gap[[i]]<-list("rr"=rr,"beta"=betagap,"ratios"=ratios)
 
                 if (i %% 5 == 0){
-                    saveRDS(rr_gap,paste0('../FusionGMMdata/Ln/Ln_n_',n_int,'_ir_',inv_r,'_pX_',p_X,'.rds'))
+                    saveRDS(rr_gap,paste0('../FusionGMMdata/LnfromLg/Ln_n_',n_int,'_ir_',inv_r,'_pX_',p_X,'.rds'))
                 }
             }
         }}}

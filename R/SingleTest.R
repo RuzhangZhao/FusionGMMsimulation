@@ -1,8 +1,8 @@
 
 
-id1<-1
+id1<-2
 id2<-2
-id3<-3
+id3<-6
 p_X_list<-c(10,40)
 #inv_r_list<-c(3,6,10,30)
 inv_r_list<-c(30,10,6,3)
@@ -34,8 +34,8 @@ X_nonzero_index<-1:10
 A_nonzero_index<-c(11,12,13,17,21,26,31,34,36,50,64,67,69,88,90)-10 #15 nonzero
 #coef_X[1:p_X]<-0.2
 #coef_A[1:p_A]<-0.061
-coef_X[X_nonzero_index]<- rnorm(length(X_nonzero_index),0.3,0.001)
-coef_A[A_nonzero_index]<- rnorm(length(A_nonzero_index),0.25,0.001)
+coef_X[X_nonzero_index]<- 0.3
+coef_A[A_nonzero_index]<- 0.25
 #coef_A[A_nonzero_index[1:5]]<- 0.1
 #coef_A[A_nonzero_index2]<- -0.1
 coefXA<-c(coef_X,coef_A)
@@ -113,9 +113,9 @@ if(T){
     y0<-My0$y
     #saveRDS(My0,paste0("/users/rzhao1/fusion/test/test2_",p_X,".rds"))
 }else{
-    My0<-readRDS(paste0("/users/rzhao1/fusion/test/test2_",p_X,".rds"))
-    M0<-My0$M
-    y0<-My0$y
+    #My0<-readRDS(paste0("/users/rzhao1/fusion/test/test2_",p_X,".rds"))
+    #M0<-My0$M
+    #y0<-My0$y
 }
 
 R2<-function(y0,predy){
@@ -144,27 +144,34 @@ colnames(M_ext)<-XAcolnames
 sum_res<-summary_stat(M_ext,y_ext,p_X)
 multilm<-sum_res$multilm
 sum_mul<-sum_res$sum_mul
-sum_mul[[1]]$Covariance<-sum_mul[[1]]$Covariance/sum_mul[[1]]$Sample_size
 sum_uni<-sum_res$sum_uni
-fuse_mul_1lam<-fusionGMM.addition(X_int,A_int,y_int,sum_mul,penalty_type = "lasso",summary_type = "multi",approx_cross_validation =F,tune_ratio = F,initial_with_GMM = F)
+fuse_mul_1lam_2<-fusionGMM.addition(X_int,A_int,y_int,sum_mul,penalty_type = "lasso",summary_type = "multi",tune_ratio = F,use_sparseC = T)
+rmul2<-R2(y0,M0%*%fuse_mul_1lam_2$beta)
+fuse_mul_1lam_3<-fusionGMM.addition(X_int,A_int,y_int,sum_mul,penalty_type = "lasso",summary_type = "multi",tune_ratio = F,use_sparseC = F)
+rmul3<-R2(y0,M0%*%fuse_mul_1lam_3$beta)
+fuse_mul_1lam<-fusionGMM.addition(X_int,A_int,y_int,sum_mul,penalty_type = "adaptivelasso",summary_type = "multi",tune_ratio = F,inference = T)
 rmul1<-R2(y0,M0%*%fuse_mul_1lam$beta)
-fuse_mul_1lam_2init<-fusionGMM.addition(X_int,A_int,y_int,sum_mul,penalty_type = "lasso",summary_type = "multi",approx_cross_validation =F,tune_ratio = F,initial_with_GMM = T)
-rmul2<-R2(y0,M0%*%fuse_mul_1lam_2init$beta)
-fuse_mul_1lam_3C<-fusionGMM.addition(X_int,A_int,y_int,sum_mul,penalty_type = "lasso",summary_type = "multi",approx_cross_validation =F,tune_ratio = F,desparseC = T)
-rmul3<-R2(y0,M0%*%fuse_mul_1lam_3C$beta)
-fuse_mul_1lam_2init_4C<-fusionGMM.addition(X_int,A_int,y_int,sum_mul,penalty_type = "lasso",summary_type = "multi",approx_cross_validation =F,tune_ratio = F,initial_with_GMM = T,desparseC = T)
-rmul4<-R2(y0,M0%*%fuse_mul_1lam_2init_4C$beta)
-#fuse_mul<-fusionGMM.addition(X_int,A_int,y_int,sum_mul,penalty_type = "lasso",summary_type = "multi",approx_cross_validation =F,tune_ratio = T)
+#rmul11<-R2(y0,M0%*%fuse_mul_1lam$beta_other)
+##rmul12<-R2(y0,M0%*%fuse_mul_1lam$beta_other2)
+#rmul13<-R2(y0,M0%*%fuse_mul_1lam$beta_other3)
+#fuse_mul_1lam_4<-fusionGMM.addition(X_int,A_int,y_int,sum_mul,penalty_type = "lasso",summary_type = "multi",tune_ratio = F,validation_type = 'holdout')
+#rmul4<-R2(y0,M0%*%fuse_mul_1lam_4$beta)
+#fuse_mul<-fusionGMM.addition(X_int,A_int,y_int,sum_mul,penalty_type = "lasso",summary_type = "multi",tune_ratio = T)
 #rmul<-R2(y0,M0%*%fuse_mul$beta)
 #c(r0,r0X,r0A,rlasso,rmul1,rmul)
-print(c(r0,r0X,r0A,rlasso,rmul1,rmul2,rmul3,rmul4))
-fuse_mul_1lam<-fusionGMM.addition(X_int,A_int,y_int,sum_mul,penalty_type = "lasso",summary_type = "multi",approx_cross_validation =F,tune_ratio = T,initial_with_GMM = F)
-rmul1<-R2(y0,M0%*%fuse_mul_1lam$beta)
-fuse_mul_1lam_2init<-fusionGMM.addition(X_int,A_int,y_int,sum_mul,penalty_type = "lasso",summary_type = "multi",approx_cross_validation =F,tune_ratio = T,initial_with_GMM = T)
-rmul2<-R2(y0,M0%*%fuse_mul_1lam_2init$beta)
-fuse_mul_1lam_3C<-fusionGMM.addition(X_int,A_int,y_int,sum_mul,penalty_type = "lasso",summary_type = "multi",approx_cross_validation =F,tune_ratio = T,desparseC = T)
-rmul3<-R2(y0,M0%*%fuse_mul_1lam_3C$beta)
-fuse_mul_1lam_2init_4C<-fusionGMM.addition(X_int,A_int,y_int,sum_mul,penalty_type = "lasso",summary_type = "multi",approx_cross_validation =F,tune_ratio = T,initial_with_GMM = T,desparseC = T)
-rmul4<-R2(y0,M0%*%fuse_mul_1lam_2init_4C$beta)
-print(c(rmul1,rmul2,rmul3,rmul4))
+#print(c(r0,r0X,r0A,rlasso,rmul1,rmul2,rmul3,rmul4))
+print(c(fuse_mul_1lam$use_sparseC))
+print(c(rlasso,rmul1,rmul2,rmul3))
+#print(c(rmul1,rmul11,rmul12,rmul13))
+#print(c(fuse_mul_1lam$lambda_list[which.min(mse_fold)],
+#fuse_mul_1lam$lambda_list[which.min(mse_fold_sC)]))
+#print(c(fuse_mul_1lam$use_sparseC,fuse_mul_1lam_4$use_sparseC))
+print(c(fuse_mul_1lam$lambda_min,fuse_mul_1lam_2$lambda_min,fuse_mul_1lam_3$lambda_min))
 
+#M0<-M_int
+#y0<-y_int
+#rmul2<-R2(y0,M0%*%fuse_mul_1lam_2$beta)
+#rmul3<-R2(y0,M0%*%fuse_mul_1lam_3$beta)
+#rmul1<-R2(y0,M0%*%fuse_mul_1lam$beta)
+#rmul11<-R2(y0,M0%*%fuse_mul_1lam$beta_other)
+#print(c(rlasso,rmul1,rmul11,rmul2,rmul3))
